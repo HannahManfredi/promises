@@ -12,7 +12,6 @@ var pluckFirstLineFromFile = function (filePath, callback) {
     if (err) {
       callback(err);
     } else {
-      console.log('data: ', data.toString());
       let i = data.indexOf('\n');
       let firstline = data.toString().slice(0, i);
       callback(null, firstline);
