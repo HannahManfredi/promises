@@ -1,7 +1,7 @@
 /**
  * Create the promise returning `Async` suffixed versions of the functions below,
  * Promisify them if you can, otherwise roll your own promise returning function
- */ 
+ */
 
 var fs = require('fs');
 var request = require('needle');
@@ -29,7 +29,7 @@ var getGitHubProfile = function (user, callback) {
   });
 };
 
-var getGitHubProfileAsync; // TODO
+var getGitHubProfileAsync = Promise.promisify(getGitHubProfile);
 
 
 // (2) Asyncronous token generation
@@ -40,14 +40,14 @@ var generateRandomToken = function(callback) {
   });
 };
 
-var generateRandomTokenAsync; // TODO
+var generateRandomTokenAsync = Promise.promisify(generateRandomToken);
 
 
 // (3) Asyncronous file manipulation
 var readFileAndMakeItFunny = function(filePath, callback) {
   fs.readFile(filePath, 'utf8', function(err, file) {
     if (err) { return callback(err); }
-   
+
     var funnyFile = file.split('\n')
       .map(function(line) {
         return line + ' lol';
@@ -58,7 +58,32 @@ var readFileAndMakeItFunny = function(filePath, callback) {
   });
 };
 
-var readFileAndMakeItFunnyAsync; // TODO
+
+var readFileAndMakeItFunnyAsync = Promise.promisify(readFileAndMakeItFunny);
+console.log('readFileAndMakeItFunnyAsync promise: ', readFileAndMakeItFunnyAsync);
+//filepath = readFileAndMakeItFunnyAsync.path??
+// [OperationalError: ENOENT: no such file or directory, open '/test/files/file_to_read.txt'] {
+//   cause: [Error: ENOENT: no such file or directory, open '/test/files/file_to_read.txt'] {
+//     errno: -2,
+//     code: 'ENOENT',
+//     syscall: 'open',
+//     path: '/test/files/file_to_read.txt'
+//   },
+//   isOperational: true,
+//   errno: -2,
+//   code: 'ENOENT',
+//   syscall: 'open',
+//   path: '/test/files/file_to_read.txt'
+// }
+
+readFileAndMakeItFunnyAsync('/test/files/file_to_read.txt')
+  .then((data) => console.log('data: ', data))
+  .catch((error) => console.log('err', error));
+
+// readFileAndMakeItFunnyAsync().then((data) =>{
+//   const fileData = fs.readFile(data, 'utf8');
+//   console.log(fileData);
+// });
 
 // Export these functions so we can test them and reuse them in later exercises
 module.exports = {
@@ -66,3 +91,8 @@ module.exports = {
   generateRandomTokenAsync: generateRandomTokenAsync,
   readFileAndMakeItFunnyAsync: readFileAndMakeItFunnyAsync
 };
+
+var cb = function(data) {
+  console.log('data from test: ', data);
+};
+readFileAndMakeItFunny('file_to_read.txt', cb);
