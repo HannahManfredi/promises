@@ -58,32 +58,22 @@ var readFileAndMakeItFunny = function(filePath, callback) {
   });
 };
 
-
-var readFileAndMakeItFunnyAsync = Promise.promisify(readFileAndMakeItFunny);
-console.log('readFileAndMakeItFunnyAsync promise: ', readFileAndMakeItFunnyAsync);
-//filepath = readFileAndMakeItFunnyAsync.path??
-// [OperationalError: ENOENT: no such file or directory, open '/test/files/file_to_read.txt'] {
-//   cause: [Error: ENOENT: no such file or directory, open '/test/files/file_to_read.txt'] {
-//     errno: -2,
-//     code: 'ENOENT',
-//     syscall: 'open',
-//     path: '/test/files/file_to_read.txt'
-//   },
-//   isOperational: true,
-//   errno: -2,
-//   code: 'ENOENT',
-//   syscall: 'open',
-//   path: '/test/files/file_to_read.txt'
-// }
-
-readFileAndMakeItFunnyAsync('/test/files/file_to_read.txt')
-  .then((data) => console.log('data: ', data))
-  .catch((error) => console.log('err', error));
-
-// readFileAndMakeItFunnyAsync().then((data) =>{
-//   const fileData = fs.readFile(data, 'utf8');
-//   console.log(fileData);
-// });
+var readFileAndMakeItFunnyAsync = function(filePath) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(filePath, 'utf8', function(err, file) {
+      if (err) {
+        reject(err);
+      } else {
+        var funnyFile = file.split('\n')
+          .map(function(line) {
+            return line + ' lol';
+          })
+          .join('\n');
+          resolve(funnyFile);
+      }
+    });
+  });
+};
 
 // Export these functions so we can test them and reuse them in later exercises
 module.exports = {
@@ -91,8 +81,3 @@ module.exports = {
   generateRandomTokenAsync: generateRandomTokenAsync,
   readFileAndMakeItFunnyAsync: readFileAndMakeItFunnyAsync
 };
-
-var cb = function(data) {
-  console.log('data from test: ', data);
-};
-readFileAndMakeItFunny('file_to_read.txt', cb);
